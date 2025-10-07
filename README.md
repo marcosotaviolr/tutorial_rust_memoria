@@ -1,6 +1,7 @@
 # README.md — Demo: memória (stack, heap) e código com Rust (para Codespaces)
 
-# memoria_demo — Stack, Heap e Código (Rust)  
+## memoria_demo — Stack, Heap e Código (Rust)
+
 **Objetivo:** demonstrar, de forma prática e visual, como um programa compilado é carregado em memória, onde ficam dados em *stack* e *heap*, e onde está o código (texto/segmento .text).  
 Formato: exemplo em Rust (simples CLI) que pede nome e data de nascimento e calcula a idade. Foca em: alocação em stack vs heap, ponteiros/endereços e inspeção do binário/assembly.
 
@@ -9,6 +10,7 @@ Formato: exemplo em Rust (simples CLI) que pede nome e data de nascimento e calc
 ---
 
 ## Conteúdo
+
 - `Cargo.toml` (dependências)
 - `src/main.rs` (código)
 - Tutorial: compilar / executar no Codespaces
@@ -20,7 +22,7 @@ Formato: exemplo em Rust (simples CLI) que pede nome e data de nascimento e calc
 
 ---
 
-## 1. `Cargo.toml`
+### 1. `Cargo.toml`
 
 ```toml
 [package]
@@ -30,11 +32,7 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4"
-````
-
-> `chrono` é usada apenas para obter a data/ano atual de forma simples. Se preferir evitar dependências externas, veja nota na seção *variações*.
-
----
+```
 
 ## 2. `src/main.rs`
 
@@ -132,6 +130,7 @@ fn show_stack_frame(name: &String, local: i32) {
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    source $HOME/.cargo/env
    ```
+
 3. Crie o projeto (ou copie os arquivos acima):
 
    ```bash
@@ -139,6 +138,7 @@ fn show_stack_frame(name: &String, local: i32) {
    cd memoria_demo
    # substituir Cargo.toml e src/main.rs pelo conteúdo deste projeto
    ```
+
 4. Compile e execute:
 
    ```bash
@@ -154,19 +154,19 @@ fn show_stack_frame(name: &String, local: i32) {
 
 ---
 
-## 4. Como inspecionar em tempo de execução (endereços)
+## 3. Como inspecionar em tempo de execução (endereços)
 
 O programa imprime endereços observáveis. Anotem:
 
-* endereço do literal (`welcome`) — dá pista de `.rodata` ou seção semelhante do executável;
-* endereço do `String` (struct) em pilha (stack);
-* endereço do buffer (`as_ptr()`) — tipicamente no *heap*;
-* endereço do `Box` e do valor apontado — mostra pointer on stack vs value on heap;
-* endereço do `example_function` — mostra que código vive em outro segmento (tipicamente `.text`).
+- endereço do literal (`welcome`) — dá pista de `.rodata` ou seção semelhante do executável;
+- endereço do `String` (struct) em pilha (stack);
+- endereço do buffer (`as_ptr()`) — tipicamente no *heap*;
+- endereço do `Box` e do valor apontado — mostra pointer on stack vs value on heap;
+- endereço do `example_function` — mostra que código vive em outro segmento (tipicamente `.text`).
 
 ---
 
-## 5. Ver binário / assembly
+## 4. Ver binário / assembly
 
 Existem várias formas. Duas formas simples:
 
@@ -193,8 +193,8 @@ objdump -d target/release/memoria_demo | less
 
 ### (C) Ferramentas extras (opcional, para demonstração ao vivo)
 
-* `cargo-asm` (instalar via `cargo install cargo-asm`) mostra assembly por função.
-* `gdb` / `lldb` para debug e inspeção de segmentos.
+- `cargo-asm` (instalar via `cargo install cargo-asm`) mostra assembly por função.
+- `gdb` / `lldb` para debug e inspeção de segmentos.
 
 > Atenção: comandos podem variar conforme o ambiente. No Codespaces os utilitários `objdump`, `gdb` costumam estar disponíveis, mas confirme.
 
@@ -202,37 +202,37 @@ objdump -d target/release/memoria_demo | less
 
 ## 6. Discussão
 
-* **Loader / Processo:** quando você executa o binário, o *loader* do sistema operacional mapeia segmentos do executável para a memória: `.text` (código), `.rodata` (literais constantes), `.data` (variáveis globais), segments para heap e stack (heap é gerenciado pelo alocador/allocator -> `malloc`/`jemalloc`/`mimalloc`/`alloc` do Rust; stack é criado por thread).
-* **Stack:** frames crescem/encolhem no `call/return`; locais e parâmetros aparecem como endereços próximos. Funções separadas tem frames separadas (comparamos endereços em `main` vs `show_stack_frame`).
-* **Heap:** alocações dinâmicas (`String`, `Vec`, `Box`) têm seus buffers no heap; o objeto wrapper (ex.: `String` struct) vive no stack (ou em outro heap/frame) e contém ponteiros para o buffer.
-* **Código:** endereço de função demonstra que o trecho de código está em uma região separada (segmento de código).
-* **ASLR & variabilidade:** muitas plataformas usam ASLR (Address Space Layout Randomization) — endereços mudam entre execuções. Discuta isso com a classe: torna ataques mais difíceis; afeta demonstrações (pode ser um ponto de discussão).
-* **Otimizador / inlining:** em release / otimizado, o compilador pode otimizar/eliminar variáveis ou inline funções; para demonstrar stack vs heap com mais estabilidade, prefira `cargo build` (debug) para observar estruturas não-otimizadas, ou compile com `-C opt-level=0`.
+- **Loader / Processo:** quando você executa o binário, o *loader* do sistema operacional mapeia segmentos do executável para a memória: `.text` (código), `.rodata` (literais constantes), `.data` (variáveis globais), segments para heap e stack (heap é gerenciado pelo alocador/allocator -> `malloc`/`jemalloc`/`mimalloc`/`alloc` do Rust; stack é criado por thread).
+- **Stack:** frames crescem/encolhem no `call/return`; locais e parâmetros aparecem como endereços próximos. Funções separadas tem frames separadas (comparamos endereços em `main` vs `show_stack_frame`).
+- **Heap:** alocações dinâmicas (`String`, `Vec`, `Box`) têm seus buffers no heap; o objeto wrapper (ex.: `String` struct) vive no stack (ou em outro heap/frame) e contém ponteiros para o buffer.
+- **Código:** endereço de função demonstra que o trecho de código está em uma região separada (segmento de código).
+- **ASLR & variabilidade:** muitas plataformas usam ASLR (Address Space Layout Randomization) — endereços mudam entre execuções. Discuta isso com a classe: torna ataques mais difíceis; afeta demonstrações (pode ser um ponto de discussão).
+- **Otimizador / inlining:** em release / otimizado, o compilador pode otimizar/eliminar variáveis ou inline funções; para demonstrar stack vs heap com mais estabilidade, prefira `cargo build` (debug) para observar estruturas não-otimizadas, ou compile com `-C opt-level=0`.
 
 ---
 
 ## 7. Crítica e sugestões de melhoria (reflexões sobre o exercício)
 
-**Pontos fortes**
+### Pontos fortes
 
-* Simples, direto e portável.
-* Permite discutir loader/processo/segmentos sem mexer em código perigoso.
-* O uso de endereços impressos é excelente para visualização imediata.
-* Funciona bem em Codespaces (container), sem necessidade de permissões especiais.
+- Simples, direto e portável.
+- Permite discutir loader/processo/segmentos sem mexer em código perigoso.
+- O uso de endereços impressos é excelente para visualização imediata.
+- Funciona bem em Codespaces (container), sem necessidade de permissões especiais.
 
-**Riscos / limitações**
+### Riscos / limitações
 
-* Em builds otimizados (`--release`) o compilador pode eliminar variáveis não usadas ou mover/inline funções — isso pode confundir a análise dos dados. **Solução:** experimente compilar em *debug* (`cargo build`) e depois em *release* para comparar o efeito das otimizações.
-* Endereços variam por execução por causa do ASLR.
-* Usar `chrono` adiciona dependência (download no `cargo build`).
-* Codespaces é um ambiente containerizado — o processo ainda tem a mesma organização de memória, mas algumas ferramentas de baixo nível podem não estar instaladas por padrão (ex.: `objdump`). Tenha alternativas prontas (mostrar assembly gerado com `rustc --emit=asm`).
+- Em builds otimizados (`--release`) o compilador pode eliminar variáveis não usadas ou mover/inline funções — isso pode confundir a análise dos dados. **Solução:** experimente compilar em *debug* (`cargo build`) e depois em *release* para comparar o efeito das otimizações.
+- Endereços variam por execução por causa do ASLR.
+- Usar `chrono` adiciona dependência (download no `cargo build`).
+- Codespaces é um ambiente containerizado — o processo ainda tem a mesma organização de memória, mas algumas ferramentas de baixo nível podem não estar instaladas por padrão (ex.: `objdump`). Tenha alternativas prontas (mostrar assembly gerado com `rustc --emit=asm`).
 
-**Melhorias possíveis**
+### Melhorias possíveis
 
-* Adicionar modo *instrumentado* que salva um simple memory map (usando `/proc/self/maps` em Linux) para mostrar como o kernel mapeou segmentos (ótimo pra Linux/Codespaces).
-* Mostrar a diferença entre debug vs release automaticamente (rodar os dois e imprimir observações).
-* Implementar uma versão que grava somente estatísticas agregadas (evita gravar PII de alunos).
-* Incluir um slide com diagrama da memória do processo (stack, heap, bss, data, text, mmap).
+- Adicionar modo *instrumentado* que salva um simple memory map (usando `/proc/self/maps` em Linux) para mostrar como o kernel mapeou segmentos (ótimo pra Linux/Codespaces).
+- Mostrar a diferença entre debug vs release automaticamente (rodar os dois e imprimir observações).
+- Implementar uma versão que grava somente estatísticas agregadas (evita gravar PII de alunos).
+- Incluir um slide com diagrama da memória do processo (stack, heap, bss, data, text, mmap).
 
 ---
 
@@ -249,16 +249,16 @@ objdump -d target/release/memoria_demo | less
 
 ## 9. Observações finais e Ética
 
-* **Evite gravar** dados sensíveis (senhas, números etc.).
-* Não utilize este código em produção. Ele é apenas para demonstração educacional.
+- **Evite gravar** dados sensíveis (senhas, números etc.).
+- Não utilize este código em produção. Ele é apenas para demonstração educacional.
 
 ---
 
 ## 10. Recursos & comandos resumidos
 
-* Build debug: `cargo build`
-* Run debug: `cargo run`
-* Build release: `cargo build --release`
-* Generate asm: `rustc --edition=2021 -C opt-level=3 --emit=asm -o memoria.s src/main.rs`
-* Disassemble binary: `objdump -d target/release/memoria_demo | less`
-* (Optional) cargo-asm: `cargo install cargo-asm` e depois `cargo asm memoria_demo::example_function`
+- Build debug: `cargo build`
+- Run debug: `cargo run`
+- Build release: `cargo build --release`
+- Generate asm: `rustc --edition=2021 -C opt-level=3 --emit=asm -o memoria.s src/main.rs`
+- Disassemble binary: `objdump -d target/release/memoria_demo | less`
+- (Optional) cargo-asm: `cargo install cargo-asm` e depois `cargo asm memoria_demo::example_function`
